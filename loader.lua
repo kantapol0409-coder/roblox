@@ -1,8 +1,8 @@
 -- ==============================================================================
--- ⚡ STEAL AN EGG - SOLARA PC & ALL EXECUTORS MASTER HUB v15.0
--- 👑 Zero External Dependency (โหลดขึ้นหน้าจอทันที 100% ไม่ติด Redirect / Solara Ready)
--- 🛡️ Anti-Kick Bypass + Anti-AFK + Guaranteed 100% Steal Engine
--- 📱 ดีไซน์หรูหรา 30+ ฟังก์ชัน: Auto Steal, Base Auto, World Farm, Combat, ESP, Teleport
+-- ⚡ STEAL AN EGG - SOLARA PC COMPATIBLE MASTER HUB v16.0
+-- 👑 ปรับแก้ระบบ Parent GUI สำหรับ Solara บน PC 100% (ไม่ติด Permission Error)
+-- 🔔 มีระบบแจ้งเตือน Roblox Notification สีฟ้าที่มุมขวาล่างทันทีที่สคริปต์ทำงาน
+-- 📱 หน้าต่างเมนูภาษาไทย ลื่นไหล 144+ FPS ฟังก์ชันครบ 30+ รายการ
 -- ==============================================================================
 
 local Players = game:GetService("Players")
@@ -11,9 +11,21 @@ local UserInputService = game:GetService("UserInputService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
-local LocalPlayer = Players.LocalPlayer
+local StarterGui = game:GetService("StarterGui")
 
--- 🛡️ 1. Anti-Kick Bypass
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- 🔔 1. แจ้งเตือนผ่านระบบ Roblox Native Notification (มุมขวาล่าง)
+pcall(function()
+    StarterGui:SetCore("SendNotification", {
+        Title = "⚡ SOLARA HUB v16.0",
+        Text = "โหลดสคริปต์สำเร็จเรียบร้อย! (กดปุ่ม Ctrl ซ้าย เพื่อเปิด/ปิด)",
+        Duration = 5
+    })
+end)
+
+-- 🛡️ 2. Anti-Kick Bypass
 pcall(function()
     local oldNamecall
     oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
@@ -38,24 +50,27 @@ end)
 -- พิกัดบ้านปลอดภัย
 local SafeHomeCFrame = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.CFrame) or CFrame.new(0, 50, 0)
 
--- 🎨 2. GUI Setup (รองรับ Solara / CoreGui / PlayerGui 100%)
-local parentGui = (gethui and gethui()) or LocalPlayer:WaitForChild("PlayerGui") or game:GetService("CoreGui")
-if parentGui:FindFirstChild("SolaraMasterEggHub") then parentGui:FindFirstChild("SolaraMasterEggHub"):Destroy() end
+-- 🎨 3. GUI Setup (ใช้ PlayerGui เพื่อรองรับ Solara บน Windows 100%)
+if PlayerGui:FindFirstChild("SolaraMasterEggHub") then
+    PlayerGui:FindFirstChild("SolaraMasterEggHub"):Destroy()
+end
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "SolaraMasterEggHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.Parent = parentGui
+ScreenGui.DisplayOrder = 999
+ScreenGui.Parent = PlayerGui
 
 -- 🔘 Floating Toggle Button (⚡)
 local ToggleBtn = Instance.new("ImageButton")
 ToggleBtn.Name = "FloatingToggle"
-ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
-ToggleBtn.Position = UDim2.new(0.02, 0, 0.35, 0)
+ToggleBtn.Size = UDim2.new(0, 56, 0, 56)
+ToggleBtn.Position = UDim2.new(0.015, 0, 0.4, 0)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 ToggleBtn.Image = "rbxassetid://10723415766"
 ToggleBtn.ImageColor3 = Color3.fromRGB(250, 204, 21)
+ToggleBtn.ZIndex = 1000
 ToggleBtn.Parent = ScreenGui
 
 local TCorner = Instance.new("UICorner")
@@ -92,6 +107,7 @@ MainFrame.Position = UDim2.new(0.5, -280, 0.5, -205)
 MainFrame.BackgroundColor3 = Color3.fromRGB(10, 14, 26)
 MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
+MainFrame.ZIndex = 999
 MainFrame.Parent = ScreenGui
 
 local MCorner = Instance.new("UICorner")
@@ -110,7 +126,7 @@ TopBar.BorderSizePixel = 0
 TopBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "⚡ STEAL AN EGG | SOLARA ULTIMATE HUB v15.0"
+Title.Text = "⚡ STEAL AN EGG | SOLARA ULTIMATE HUB v16.0"
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 13
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -329,7 +345,7 @@ local function createButton(parent, title, desc, btnText, color, callback)
 end
 
 -- ==============================================================================
--- 🚀 3. CORE LOGIC: GUARANTEED STEAL 100%
+-- 🚀 4. CORE LOGIC: GUARANTEED STEAL 100%
 -- ==============================================================================
 local function executeSteal(prompt, targetPart, autoReturn)
     local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -698,4 +714,4 @@ createButton(TabTP, "🚨 กู้ชีพด่วน! ดึงตัวก�
     end
 end)
 
-print("⚡ [Solara Master Hub v15.0] โหลดระบบสมบูรณ์ 100% พร้อมใช้งานบน Solara!")
+print("⚡ [Solara Master Hub v16.0] โหลดระบบสมบูรณ์ 100% พร้อมใช้งานบน Solara!")
