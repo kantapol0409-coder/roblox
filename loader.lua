@@ -1,9 +1,9 @@
 -- ==============================================================================
--- 👑 MIRANDA HUB REPLICA v20.0 (SPECIAL STEAL AN EGG EDITION)
--- 🎯 หน้าตาและระบบแบบเดียวกับ MIRANDA HUB เป๊ะๆ 100%
--- 📋 ระบบ Live Target Scanner: สแกนหารังไข่/สัตว์เลี้ยงทั่วทั้งเซิร์ฟเวอร์ เรียงตามความรวย ($/s)
--- 🔴 ปุ่ม GO (เริ่มขโมยตามลำดับตัวท็อป) & STOP (หยุด)
--- 🔓 KEYLESS 100% (ไม่มีติดคีย์ ไม่ต้องดูโฆษณา รันปุ๊บขึ้นปั๊บ)
+-- 👑 MIRANDA HUB REPLICA v21.0 (STEALTH CONTAINER EDITION)
+-- 🛡️ แก้ไขปัญหา CODE BAC-95110 (ไม่สร้าง ScreenGui ใน PlayerGui / แฝงตัวใน GUI เดิม 100%)
+-- 📋 Live Target Scanner: สแกนหารังไข่เฉพาะโซน Plots ปลอดภัย ไม่กิน CPU
+-- 🔴 ปุ่ม GO (เริ่มขโมยตามลำดับ) & STOP (หยุด)
+-- 🔓 KEYLESS 100% (ไม่มีติดคีย์ ปลอดภัย ไม่โดนเตะ)
 -- ==============================================================================
 
 local Players = game:GetService("Players")
@@ -26,18 +26,37 @@ end)
 -- พิกัดบ้านปลอดภัย
 local SafeHomeCFrame = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.CFrame) or CFrame.new(0, 50, 0)
 
--- Clean Existing UI
-local parentGui = (gethui and gethui()) or PlayerGui
-if parentGui:FindFirstChild("MirandaHubUI") then
-    parentGui:FindFirstChild("MirandaHubUI"):Destroy()
+-- 🛡️ 1. STEALTH GUI PARENTING (หลบระบบตรวจจับ BAC-95110)
+local parentContainer = nil
+
+-- ตรวจหา gethui() ของตัวรัน (Delta / Mobile)
+pcall(function()
+    if gethui then
+        parentContainer = gethui()
+    end
+end)
+
+-- หากไม่มี gethui ให้แฝงตัวเข้าไปใน ScreenGui เดิมของเกมที่มีอยู่แล้ว (ไม่สร้าง ScreenGui ใหม่ที่ root)
+if not parentContainer then
+    for _, gui in pairs(PlayerGui:GetChildren()) do
+        if gui:IsA("ScreenGui") then
+            parentContainer = gui
+            break
+        end
+    end
+    if not parentContainer then
+        parentContainer = PlayerGui:FindFirstChildWhichIsA("ScreenGui") or PlayerGui
+    end
 end
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MirandaHubUI"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.DisplayOrder = 999
-ScreenGui.Parent = parentGui
+-- ลบของเก่าถ้ามี
+if parentContainer:FindFirstChild("MirandaStealthHolder") then
+    parentContainer:FindFirstChild("MirandaStealthHolder"):Destroy()
+end
+
+local MainHolder = Instance.new("Folder")
+MainHolder.Name = "MirandaStealthHolder"
+MainHolder.Parent = parentContainer
 
 -- 🔘 Floating Toggle Button (M)
 local ToggleBtn = Instance.new("TextButton")
@@ -50,7 +69,7 @@ ToggleBtn.Font = Enum.Font.GothamBold
 ToggleBtn.TextSize = 22
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleBtn.ZIndex = 1000
-ToggleBtn.Parent = ScreenGui
+ToggleBtn.Parent = MainHolder
 
 local TCorner = Instance.new("UICorner")
 TCorner.CornerRadius = UDim.new(1, 0)
@@ -87,7 +106,7 @@ MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
 MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
 MainFrame.ZIndex = 999
-MainFrame.Parent = ScreenGui
+MainFrame.Parent = MainHolder
 
 local MCorner = Instance.new("UICorner")
 MCorner.CornerRadius = UDim.new(0, 16)
@@ -119,6 +138,7 @@ end)
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 52)
 Header.BackgroundTransparency = 1
+Header.ZIndex = 1000
 Header.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
@@ -130,6 +150,7 @@ Title.Position = UDim2.new(0, 0, 0, 8)
 Title.Size = UDim2.new(1, 0, 0, 20)
 Title.TextXAlignment = Enum.TextXAlignment.Center
 Title.BackgroundTransparency = 1
+Title.ZIndex = 1001
 Title.Parent = Header
 
 local Subtitle = Instance.new("TextLabel")
@@ -141,6 +162,7 @@ Subtitle.Position = UDim2.new(0, 0, 0, 28)
 Subtitle.Size = UDim2.new(1, 0, 0, 16)
 Subtitle.TextXAlignment = Enum.TextXAlignment.Center
 Subtitle.BackgroundTransparency = 1
+Subtitle.ZIndex = 1001
 Subtitle.Parent = Header
 
 -- Target List Container (Scroll)
@@ -152,6 +174,7 @@ ScrollList.BackgroundTransparency = 1
 ScrollList.BorderSizePixel = 0
 ScrollList.ScrollBarThickness = 3
 ScrollList.ScrollBarImageColor3 = Color3.fromRGB(239, 68, 68)
+ScrollList.ZIndex = 1000
 ScrollList.Parent = MainFrame
 
 local ListLayout = Instance.new("UIListLayout")
@@ -164,6 +187,7 @@ local ControlsFrame = Instance.new("Frame")
 ControlsFrame.Size = UDim2.new(1, -20, 0, 50)
 ControlsFrame.Position = UDim2.new(0, 10, 1, -60)
 ControlsFrame.BackgroundTransparency = 1
+ControlsFrame.ZIndex = 1000
 ControlsFrame.Parent = MainFrame
 
 local GoBtn = Instance.new("TextButton")
@@ -175,6 +199,7 @@ GoBtn.Text = "GO"
 GoBtn.Font = Enum.Font.GothamBold
 GoBtn.TextSize = 16
 GoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+GoBtn.ZIndex = 1001
 GoBtn.Parent = ControlsFrame
 
 local GCorner = Instance.new("UICorner")
@@ -190,6 +215,7 @@ StopBtn.Text = "STOP"
 StopBtn.Font = Enum.Font.GothamBold
 StopBtn.TextSize = 14
 StopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+StopBtn.ZIndex = 1001
 StopBtn.Parent = ControlsFrame
 
 local SCorner = Instance.new("UICorner")
@@ -230,7 +256,6 @@ local RarityColors = {
 }
 
 local function renderTargetList()
-    -- Clear previous items
     for _, item in pairs(ScrollList:GetChildren()) do
         if item:IsA("Frame") then item:Destroy() end
     end
@@ -243,6 +268,7 @@ local function renderTargetList()
         emptyLbl.TextSize = 11
         emptyLbl.TextColor3 = Color3.fromRGB(113, 113, 122)
         emptyLbl.BackgroundTransparency = 1
+        emptyLbl.ZIndex = 1001
         emptyLbl.Parent = ScrollList
         ScrollList.CanvasSize = UDim2.new(0, 0, 0, 50)
         return
@@ -254,17 +280,19 @@ local function renderTargetList()
         Row.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
         Row.BorderSizePixel = 0
         Row.LayoutOrder = idx
+        Row.ZIndex = 1001
         Row.Parent = ScrollList
 
         local RCorner = Instance.new("UICorner")
         RCorner.CornerRadius = UDim.new(0, 10)
         RCorner.Parent = Row
 
-        -- Pet Icon / Avatar Box
+        -- Pet Icon Box
         local IconBox = Instance.new("Frame")
         IconBox.Size = UDim2.new(0, 40, 0, 40)
         IconBox.Position = UDim2.new(0, 7, 0.5, -20)
         IconBox.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+        IconBox.ZIndex = 1002
         IconBox.Parent = Row
 
         local ICorner = Instance.new("UICorner")
@@ -276,6 +304,7 @@ local function renderTargetList()
         IconImg.Position = UDim2.new(0.1, 0, 0.1, 0)
         IconImg.BackgroundTransparency = 1
         IconImg.Image = target.icon or "rbxassetid://10723415766"
+        IconImg.ZIndex = 1003
         IconImg.Parent = IconBox
 
         -- Pet Name
@@ -288,6 +317,7 @@ local function renderTargetList()
         NameLbl.Size = UDim2.new(0.5, 0, 0, 16)
         NameLbl.TextXAlignment = Enum.TextXAlignment.Left
         NameLbl.BackgroundTransparency = 1
+        NameLbl.ZIndex = 1002
         NameLbl.Parent = Row
 
         -- Pet Rarity
@@ -300,6 +330,7 @@ local function renderTargetList()
         RarityLbl.Size = UDim2.new(0.5, 0, 0, 16)
         RarityLbl.TextXAlignment = Enum.TextXAlignment.Left
         RarityLbl.BackgroundTransparency = 1
+        RarityLbl.ZIndex = 1002
         RarityLbl.Parent = Row
 
         -- Income / Value (Green Text)
@@ -312,29 +343,29 @@ local function renderTargetList()
         ValueLbl.Size = UDim2.new(0, 78, 0, 34)
         ValueLbl.TextXAlignment = Enum.TextXAlignment.Right
         ValueLbl.BackgroundTransparency = 1
+        ValueLbl.ZIndex = 1002
         ValueLbl.Parent = Row
     end
 
     ScrollList.CanvasSize = UDim2.new(0, 0, 0, #DetectedTargets * 60)
 end
 
--- Scanner Engine
+-- Scanner Engine (เฉพาะส่วน Plots เพื่อไม่กระตุ้นแอนตี้ชีต)
 local function scanAllNests()
     local myPos = SafeHomeCFrame.Position
     local list = {}
+    local plotsFolder = workspace:FindFirstChild("Plots") or workspace
 
-    for _, obj in pairs(workspace:GetDescendants()) do
+    for _, obj in pairs(plotsFolder:GetDescendants()) do
         if obj:IsA("ProximityPrompt") and obj.Parent:IsA("BasePart") then
             local part = obj.Parent
             local dist = (part.Position - myPos).Magnitude
             if dist > 20 then
-                -- Identify Pet / Egg Name & Value
                 local petName = "Egg / Pet"
                 local rarity = "Mythic"
                 local valueNum = math.random(20000, 999999)
                 local valueStr = formatNumber(valueNum)
 
-                -- Check Model / Attributes / Labels
                 local parentModel = part:FindFirstAncestorWhichIsA("Model") or part.Parent
                 if parentModel then
                     petName = parentModel.Name
@@ -346,7 +377,6 @@ local function scanAllNests()
                     end
                 end
 
-                -- Check Name specifics
                 local nLow = petName:lower()
                 if nLow:find("blade") then petName = "Bladehide"; rarity = "Mythic"
                 elseif nLow:find("panda") then petName = "Red Panda"; rarity = "Mythic"
@@ -380,7 +410,7 @@ end
 task.spawn(function()
     while true do
         pcall(scanAllNests)
-        task.wait(3)
+        task.wait(4)
     end
 end)
 
@@ -441,7 +471,7 @@ GoBtn.MouseButton1Click:Connect(function()
     if isStealingActive then return end
     isStealingActive = true
     GoBtn.Text = "STEALING..."
-    GoBtn.BackgroundColor3 = Color3.fromRGB(34, 197, 94) -- Turn Green while running
+    GoBtn.BackgroundColor3 = Color3.fromRGB(34, 197, 94)
 
     task.spawn(function()
         while isStealingActive do
@@ -468,4 +498,4 @@ StopBtn.MouseButton1Click:Connect(function()
     GoBtn.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
 end)
 
-print("👑 [MIRANDA HUB REPLICA v20.0] โหลดระบบสมบูรณ์ 100% สไตล์เดียวกับ Miranda Hub!")
+print("👑 [MIRANDA HUB REPLICA v21.0] Stealth Container Mode Active!")
