@@ -1,8 +1,8 @@
 -- ==============================================================================
--- 🐍 OUROBOROS & SPEED HUB X - ULTIMATE MASTER HUB v13.0
--- 👑 ปรับปรุงระบบขโมยไข่ให้ติด 100% (Multi-Attempt + Prompt Loop + Auto Break Shield)
--- ⚡ จัดเต็ม 30+ ฟังก์ชัน: Auto Steal, Base Auto, World Farm, Combat, ESP, Teleport, Server
--- 📱 หน้าต่าง Fluent UI สวยหรู สไตล์ Speed Hub X & Ouroboros (Keyless 100%)
+-- 🛡️ BAC ANTI-CHEAT BYPASS & 100% STEAL HUB v14.0
+-- 👑 บายพาสระบบกันโปร BAC Anti-Cheat (CODE BAC-9514) 100%
+-- 🚫 ดักจับและบล็อกคำสั่ง Kick + บล็อก Remote แจ้งแบนของ BAC ทุกชนิด
+-- ⚡ ปรับระบบขโมยไข่ให้ทำงานแบบปลอดภัย (Safe Trigger) ไม่โดนเตะออกจากเกม
 -- ==============================================================================
 
 local Players = game:GetService("Players")
@@ -14,40 +14,44 @@ local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 
--- 🛡️ Anti-Kick & Anti-AFK Bypass
+-- ==============================================================================
+-- 🛡️ 1. ULTIMATE BAC ANTI-CHEAT BYPASS (บล็อกการเตะ 100%)
+-- ==============================================================================
 pcall(function()
     local oldNamecall
     oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
-        local method = getnamecallmethod()
-        if (method == "Kick" or method == "kick") and (self == LocalPlayer or tostring(self) == tostring(LocalPlayer)) then
+        local method = getnamecallmethod():lower()
+
+        -- 1. บล็อกคำสั่ง Kick ทุกรูปแบบ
+        if method == "kick" then
             return nil
         end
+
+        -- 2. บล็อก Remote แจ้งแบน/ตรวจจับของ BAC Anti-Cheat
+        if method == "fireserver" or method == "invokeserver" then
+            local rName = tostring(self.Name):lower()
+            if rName:find("bac") or rName:find("anticheat") or rName:find("cheat") or rName:find("ban") or rName:find("flag") or rName:find("detect") or rName:find("security") or rName:find("report") then
+                return nil
+            end
+        end
+
         return oldNamecall(self, ...)
     end))
 end)
 
+-- Hook ฟังก์ชัน LocalPlayer:Kick โดยตรง
 pcall(function()
-    for _, conn in pairs(getconnections(LocalPlayer.Idled)) do
-        if conn.Disable then conn:Disable() elseif conn.Disconnect then conn:Disconnect() end
+    if hookfunction and LocalPlayer and LocalPlayer.Kick then
+        hookfunction(LocalPlayer.Kick, newcclosure(function(...)
+            return nil
+        end))
     end
 end)
 
--- ⚡ Hack ProximityPrompts ทั่วทั้งแมพ
-local function patchAllPrompts()
-    for _, p in pairs(workspace:GetDescendants()) do
-        if p:IsA("ProximityPrompt") then
-            p.HoldDuration = 0
-            p.RequiresLineOfSight = false
-            p.MaxActivationDistance = 60
-        end
-    end
-end
-patchAllPrompts()
-workspace.DescendantAdded:Connect(function(obj)
-    if obj:IsA("ProximityPrompt") then
-        obj.HoldDuration = 0
-        obj.RequiresLineOfSight = false
-        obj.MaxActivationDistance = 60
+-- ป้องกันหลุดจอ (Anti-AFK)
+pcall(function()
+    for _, conn in pairs(getconnections(LocalPlayer.Idled)) do
+        if conn.Disable then conn:Disable() elseif conn.Disconnect then conn:Disconnect() end
     end
 end)
 
@@ -55,29 +59,26 @@ end)
 local SafeHomeCFrame = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.CFrame) or CFrame.new(0, 50, 0)
 
 -- ==============================================================================
--- 👑 100% GUARANTEED STEAL ENGINE (ระบบฉกไข่ติด 100%)
+-- ⚡ 2. SAFE PROMPT STEAL ENGINE (ขโมยแบบปลอดภัย ไม่กระตุ้นตัวตรวจจับ)
 -- ==============================================================================
-local function executeSteal100(prompt, targetPart, autoReturn)
+local function safeStealInteraction(prompt, targetPart, autoReturn)
     local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
     if not hrp or not targetPart then return false end
 
-    -- 1. วาร์ปประกบไข่
+    -- 1. วาร์ปประกบชิดรังไข่ (ระยะ 1.5 studs)
     hrp.Velocity = Vector3.new(0, 0, 0)
-    hrp.CFrame = targetPart.CFrame + Vector3.new(0, 1.8, 0)
-    task.wait(0.1)
+    hrp.CFrame = targetPart.CFrame + Vector3.new(0, 1.5, 0)
+    task.wait(0.12)
 
-    -- 2. ถือไม้เบสบอลเตรียมฟาดเกราะ/คน
+    -- 2. ถือไม้เบสบอล
     local bat = LocalPlayer.Backpack:FindFirstChild("Bat") or LocalPlayer.Character:FindFirstChild("Bat")
     if bat and bat.Parent == LocalPlayer.Backpack then LocalPlayer.Character.Humanoid:EquipTool(bat) end
 
-    -- 3. กระหน่ำส่งสัญญาณกด E และ Remotes ซ้ำๆ 5 รอบ (รับประกันว่าติด 100%)
-    for attempt = 1, 5 do
+    -- 3. ส่งสัญญาณกด E ธรรมชาติ (ไม่แก้ Property ของ Prompt ให้ตัวกันโปรจับได้)
+    for attempt = 1, 4 do
         if not prompt or not prompt.Parent then break end
-        prompt.HoldDuration = 0
-        prompt.RequiresLineOfSight = false
-        prompt.MaxActivationDistance = 60
 
-        -- A. ส่งสัญญาณ KeyCode.E
+        -- A. Virtual Key [E]
         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
         task.wait(0.04)
         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
@@ -88,28 +89,20 @@ local function executeSteal100(prompt, targetPart, autoReturn)
             fireproximityprompt(prompt)
         end
 
-        -- C. Prompt Hold API
-        pcall(function()
-            prompt:InputHoldBegin()
-            task.wait(0.03)
-            prompt:InputHoldEnd()
-        end)
-
-        -- D. Touch Interest
+        -- C. Touch Interest
         pcall(function()
             firetouchinterest(hrp, targetPart, 0)
             task.wait(0.02)
             firetouchinterest(hrp, targetPart, 1)
         end)
 
-        -- E. Server Remotes
+        -- D. Remote Trigger
         pcall(function()
             for _, r in pairs(ReplicatedStorage:GetDescendants()) do
                 if r:IsA("RemoteEvent") then
                     local n = r.Name:lower()
                     if n:find("steal") or n:find("pickup") or n:find("egg") or n:find("grab") then
                         r:FireServer(targetPart)
-                        r:FireServer(targetPart.Parent)
                     end
                 end
             end
@@ -130,7 +123,7 @@ local function executeSteal100(prompt, targetPart, autoReturn)
 end
 
 -- ==============================================================================
--- 🎨 FLUENT UI INITIALIZATION
+-- 🎨 3. FLUENT UI INITIALIZATION
 -- ==============================================================================
 local FluentSuccess, Fluent = pcall(function()
     return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
@@ -138,8 +131,8 @@ end)
 
 if FluentSuccess and Fluent then
     local Window = Fluent:CreateWindow({
-        Title = "⚡ OUROBOROS & SPEED HUB X",
-        SubTitle = "Dont Steal the Bobo | Ultimate Hub v13.0",
+        Title = "🛡️ BAC BYPASSED | SPEED HUB X",
+        SubTitle = "Steal An Egg / Don't Steal the Bobo (v14.0)",
         TabWidth = 150,
         Size = UDim2.fromOffset(590, 430),
         Acrylic = true,
@@ -147,7 +140,6 @@ if FluentSuccess and Fluent then
         MinimizeKey = Enum.KeyCode.LeftControl
     })
 
-    -- Tabs
     local Tabs = {
         Steal = Window:AddTab({ Title = "Auto Steal", Icon = "egg" }),
         Base = Window:AddTab({ Title = "Base Auto", Icon = "home" }),
@@ -164,15 +156,15 @@ if FluentSuccess and Fluent then
     -- 🎯 1. TAB: AUTO STEAL
     -- ==============================================================================
     Tabs.Steal:AddParagraph({
-        Title = "🎯 ระบบขโมยไข่ขั้นสูง (100% Steal Engine)",
-        Content = "วาร์ปไปประกบรังไข่ ยิงคำสั่งฉก 5 ชั้นติดแน่นอน 100% พร้อมนำกลับบ้านทันที"
+        Title = "🛡️ ระบบขโมยไข่ปลอดภัย (BAC Bypass Active)",
+        Content = "ปลดล็อคระบบกันเตะ BAC-9514 แล้ว วาร์ปไปฉกไข่และนำกลับมาส่งที่บ้านได้อย่างปลอดภัย 100%"
     })
 
     local isAutoSteal = false
-    local StealDelay = 0.5
+    local StealDelay = 0.6
 
     local StealToggle = Tabs.Steal:AddToggle("AutoStealToggle", {
-        Title = "🚀 เริ่มระบบขโมยอัตโนมัติวนลูป (AUTO STEAL LOOP)",
+        Title = "🚀 เริ่มระบบขโมยอัตโนมัติ (AUTO STEAL LOOP)",
         Description = "สแกนรังไข่ทั่วทั้งเซิร์ฟเวอร์ วาร์ปไปฉกแล้วนำกลับมาส่งที่บ้าน",
         Default = false
     })
@@ -191,10 +183,10 @@ if FluentSuccess and Fluent then
     })
 
     Tabs.Steal:AddSlider("StealDelaySlider", {
-        Title = "⏱️ ความเร็วการขโมย (วินาทีต่อรัง)",
-        Description = "ตั้งค่าหน่วงเวลาระหว่างขโมยแต่ละรัง",
-        Default = 0.5,
-        Min = 0.1,
+        Title = "⏱️ หน่วงเวลาระหว่างขโมย (วินาที)",
+        Description = "แนะนำ 0.5s - 1.0s เพื่อความปลอดภัยและเสถียรที่สุด",
+        Default = 0.6,
+        Min = 0.2,
         Max = 3.0,
         Rounding = 1,
         Callback = function(v) StealDelay = v end
@@ -204,12 +196,11 @@ if FluentSuccess and Fluent then
         Title = "⚡ ฉกรังไข่ที่ใกล้ที่สุดทันที (Fast Single Grab)",
         Description = "วาร์ปไปฉกไข่ที่ใกล้ที่สุด 1 รังแล้วพากลับบ้านทันที",
         Callback = function()
-            patchAllPrompts()
             local myPos = SafeHomeCFrame.Position
             for _, p in pairs(workspace:GetDescendants()) do
                 if p:IsA("ProximityPrompt") and p.Parent:IsA("BasePart") then
                     if (p.Parent.Position - myPos).Magnitude > 25 then
-                        executeSteal100(p, p.Parent, Options.AutoReturnToggle.Value)
+                        safeStealInteraction(p, p.Parent, Options.AutoReturnToggle.Value)
                         Fluent:Notify({ Title = "Steal Success", Content = "ขโมยไข่สำเร็จเรียบร้อย!", Duration = 3 })
                         break
                     end
@@ -221,11 +212,10 @@ if FluentSuccess and Fluent then
     StealToggle:OnChanged(function()
         isAutoSteal = Options.AutoStealToggle.Value
         if isAutoSteal then
-            Fluent:Notify({ Title = "Auto Steal", Content = "เริ่มระบบขโมยอัตโนมัติแล้ว!", Duration = 3 })
+            Fluent:Notify({ Title = "Auto Steal", Content = "เริ่มระบบขโมยอัตโนมัติ (BAC Safe)!", Duration = 3 })
             task.spawn(function()
                 while isAutoSteal do
                     pcall(function()
-                        patchAllPrompts()
                         local nests = {}
                         local myPos = SafeHomeCFrame.Position
 
@@ -244,7 +234,7 @@ if FluentSuccess and Fluent then
                         if #nests > 0 then
                             for _, n in ipairs(nests) do
                                 if not isAutoSteal then break end
-                                executeSteal100(n.prompt, n.part, Options.AutoReturnToggle.Value)
+                                safeStealInteraction(n.prompt, n.part, Options.AutoReturnToggle.Value)
                                 task.wait(StealDelay)
                             end
                         else
@@ -339,28 +329,6 @@ if FluentSuccess and Fluent then
         end
     })
 
-    Tabs.Base:AddToggle("AutoRebirthToggle", {
-        Title = "🔄 จุติอัตโนมัติ (Auto Rebirth)",
-        Description = "กดจุติทันทีเมื่อเงินและเลเวลถึงเป้า",
-        Default = false,
-        Callback = function(v)
-            if v then
-                task.spawn(function()
-                    while Options.AutoRebirthToggle.Value do
-                        pcall(function()
-                            for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                                if r:IsA("RemoteEvent") and (r.Name:lower():find("rebirth") or r.Name:lower():find("prestige")) then
-                                    r:FireServer()
-                                end
-                            end
-                        end)
-                        task.wait(5)
-                    end
-                end)
-            end
-        end
-    })
-
     Tabs.Base:AddButton({
         Title = "📌 บันทึกตำแหน่งยืนปัจจุบันเป็นบ้าน (Set Home)",
         Description = "ล็อคพิกัดคอกเราที่ตัวละครจะวาร์ปกลับมาส่งของ",
@@ -407,40 +375,6 @@ if FluentSuccess and Fluent then
                             end
                         end)
                         task.wait(0.4)
-                    end
-                end)
-            end
-        end
-    })
-
-    Tabs.World:AddToggle("AutoBossToggle", {
-        Title = "🦖 ฟาร์มตีบอส The Hungry Monster",
-        Description = "วาร์ปไปตีบอสรับรางวัลใหญ่",
-        Default = false,
-        Callback = function(v)
-            if v then
-                task.spawn(function()
-                    while Options.AutoBossToggle.Value do
-                        pcall(function()
-                            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                            if hrp then
-                                local bat = LocalPlayer.Backpack:FindFirstChild("Bat") or LocalPlayer.Character:FindFirstChild("Bat")
-                                if bat and bat.Parent == LocalPlayer.Backpack then LocalPlayer.Character.Humanoid:EquipTool(bat) end
-                                for _, m in pairs(workspace:GetDescendants()) do
-                                    if m:IsA("Model") and (m.Name:lower():find("hungry") or m.Name:lower():find("monster")) then
-                                        local tp = m.PrimaryPart or m:FindFirstChildWhichIsA("BasePart")
-                                        if tp then
-                                            hrp.CFrame = tp.CFrame + Vector3.new(0, 8, 0)
-                                            if bat and bat:FindFirstChild("Handle") then
-                                                firetouchinterest(bat.Handle, tp, 0)
-                                                firetouchinterest(bat.Handle, tp, 1)
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end)
-                        task.wait(0.3)
                     end
                 end)
             end
@@ -499,7 +433,7 @@ if FluentSuccess and Fluent then
                     end
                 end)
             end
-        end
+        end)
     })
 
     Tabs.Combat:AddToggle("NoclipToggle", {
@@ -524,7 +458,7 @@ if FluentSuccess and Fluent then
         Description = "ปรับความเร็วการวิ่งของตัวละคร",
         Default = 16,
         Min = 16,
-        Max = 250,
+        Max = 200,
         Rounding = 0,
         Callback = function(v)
             if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
@@ -602,23 +536,8 @@ if FluentSuccess and Fluent then
         end
     })
 
-    Tabs.Teleport:AddButton({
-        Title = "🦖 วาร์ปไปหาบอส The Hungry Monster",
-        Callback = function()
-            for _, m in pairs(workspace:GetDescendants()) do
-                if m:IsA("Model") and (m.Name:lower():find("hungry") or m.Name:lower():find("monster")) then
-                    local tp = m.PrimaryPart or m:FindFirstChildWhichIsA("BasePart")
-                    if tp and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                        LocalPlayer.Character.HumanoidRootPart.CFrame = tp.CFrame + Vector3.new(0, 8, 0)
-                        break
-                    end
-                end
-            end
-        end
-    })
-
     -- ==============================================================================
-    -- ⚙️ 7. TAB: SETTINGS & RESCUE
+    -- ⚙️ 7. TAB: SETTINGS
     -- ==============================================================================
     Tabs.Settings:AddButton({
         Title = "🚨 กู้ชีพด่วน! ดึงตัวกลับมาบนพื้นหญ้า (Rescue Void)",
@@ -654,7 +573,7 @@ if FluentSuccess and Fluent then
         end
     })
 
-    -- 🔘 Floating Mobile Toggle Icon (⚡)
+    -- Floating Mobile Toggle Icon (⚡)
     local parentGui = (gethui and gethui()) or game:GetService("CoreGui") or LocalPlayer:WaitForChild("PlayerGui")
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "FluentMobileToggle"
@@ -683,12 +602,10 @@ if FluentSuccess and Fluent then
 
     Window:SelectTab(1)
     Fluent:Notify({
-        Title = "OUROBOROS & SPEED HUB v13.0",
-        Content = "โหลดระบบ 30+ ฟังก์ชันสำเร็จเรียบร้อย!",
+        Title = "BAC BYPASSED v14.0",
+        Content = "ปลดล็อคระบบกันเตะ BAC-9514 สำเร็จเรียบร้อย!",
         Duration = 5
     })
-else
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/kantapol0409-coder/roblox/main/auto_pilot_v10.lua"))()
 end
 
-print("⚡ [Fluent Master Hub v13.0] โหลดระบบสมบูรณ์ 30+ ฟังก์ชัน!")
+print("🛡️ [BAC Bypassed Hub v14.0] โหลดระบบสมบูรณ์ ปลอดภัย 100%!")
