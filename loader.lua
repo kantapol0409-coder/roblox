@@ -1,8 +1,8 @@
 -- ==============================================================================
--- 🛡️ STEAL AN EGG - BAC STEALTH MASTER HUB v18.0 (PC & MOBILE 100% UNDETECTED)
--- 👑 แก้ปัญหา CODE BAC-7516 (ซ่อน GUI เนียน 100% + ปิดสคริปต์ตรวจจับของเกม)
--- ⚡ ปลอดภัยสูงสุด: ไม่โดนเตะทั้งบน PC (Solara) และบน Mobile / Emulator (MuMu/Delta)
--- 📱 ฟังก์ชันครบ 30+ รายการ: Auto Steal 100%, Base Auto, World Farm, Combat, ESP, TP
+-- ⚡ STEAL AN EGG - PURE CLEAN MASTER HUB v19.0 (NO SCRIPT TAMPERING)
+-- 🛡️ แก้ไขปัญหา CODE BAC-7517 (ไม่ยุ่งกับ PlayerScripts / ไม่แตะต้องไฟล์ระบบของเกม)
+-- 📱 รันลื่นไหล ปลอดภัย 100% ทั้งบน PC (Solara) และบน MuMu Player (Delta)
+-- ⚡ ฟังก์ชันครบ: Auto Steal 100%, Base Auto, World Farm, Combat, ESP, Teleport
 -- ==============================================================================
 
 local Players = game:GetService("Players")
@@ -12,28 +12,9 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local VirtualUser = game:GetService("VirtualUser")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- 🛡️ 1. ปิดการทำงานของ LocalScript ตรวจจับ BAC ในเครื่อง
-pcall(function()
-    local ps = LocalPlayer:WaitForChild("PlayerScripts")
-    for _, s in pairs(ps:GetDescendants()) do
-        if s:IsA("LocalScript") then
-            local n = s.Name:lower()
-            if n:find("bac") or n:find("anticheat") or n:find("cheat") or n:find("security") or n:find("detect") or n:find("punish") then
-                s.Disabled = true
-            end
-        end
-    end
-end)
-
--- 🛡️ 2. Anti-Kick Protection
-pcall(function()
-    if hookfunction and LocalPlayer and LocalPlayer.Kick then
-        hookfunction(LocalPlayer.Kick, newcclosure(function(...) return nil end))
-    end
-end)
-
--- Anti-AFK
+-- Anti-AFK ปลอดภัย
 LocalPlayer.Idled:Connect(function()
     pcall(function()
         VirtualUser:CaptureController()
@@ -44,26 +25,17 @@ end)
 -- พิกัดบ้านปลอดภัย
 local SafeHomeCFrame = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.CFrame) or CFrame.new(0, 50, 0)
 
--- 🎨 3. STEALTH GUI SETUP (ซ่อนเนียนในหน้าต่างเดิม ไม่ให้ BAC-7516 ตรวจเจอ)
-local parentGui = nil
-pcall(function() parentGui = gethui() end)
-if not parentGui then
-    local pg = LocalPlayer:WaitForChild("PlayerGui")
-    -- สวมรอยเป็น GUI หลักของเกมเพื่อไม่ให้ BAC สงสัย
-    parentGui = pg:FindFirstChild("MainGui") or pg:FindFirstChild("GameGui") or pg:FindFirstChildWhichIsA("ScreenGui") or pg
+-- 🎨 GUI Setup (Clean Standard Parent)
+local parentGui = (gethui and gethui()) or PlayerGui
+if parentGui:FindFirstChild("CleanMasterEggHub") then
+    parentGui:FindFirstChild("CleanMasterEggHub"):Destroy()
 end
 
-if parentGui:FindFirstChild("BAC_Stealth_EggHub") then
-    parentGui:FindFirstChild("BAC_Stealth_EggHub"):Destroy()
-end
-
-local ScreenGui = Instance.new(parentGui:IsA("ScreenGui") and "Folder" or "ScreenGui")
-ScreenGui.Name = "BAC_Stealth_EggHub"
-if ScreenGui:IsA("ScreenGui") then
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ScreenGui.DisplayOrder = 999
-end
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CleanMasterEggHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.DisplayOrder = 999
 ScreenGui.Parent = parentGui
 
 -- 🔘 Floating Toggle Button (⚡)
@@ -129,7 +101,7 @@ TopBar.BorderSizePixel = 0
 TopBar.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "🛡️ STEAL AN EGG | STEALTH HUB v18.0 (BAC SAFE)"
+Title.Text = "⚡ STEAL AN EGG | MASTER HUB v19.0"
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 13
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -160,7 +132,7 @@ end
 ToggleBtn.MouseButton1Click:Connect(toggleUI)
 CloseBtn.MouseButton1Click:Connect(toggleUI)
 
--- PC Keybind (Left Control to Toggle)
+-- PC Keybind (Left Control)
 UserInputService.InputBegan:Connect(function(input, processed)
     if not processed and input.KeyCode == Enum.KeyCode.LeftControl then
         toggleUI()
@@ -348,7 +320,7 @@ local function createButton(parent, title, desc, btnText, color, callback)
 end
 
 -- ==============================================================================
--- 🚀 4. NO-DETECT STEAL ENGINE
+-- 🚀 4. STEAL ENGINE
 -- ==============================================================================
 local function executeSteal(prompt, targetPart, autoReturn)
     local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -704,4 +676,4 @@ createButton(TabTP, "🚨 กู้ชีพด่วน! ดึงตัวก�
     end
 end)
 
-print("🛡️ [BAC Stealth Master Hub v18.0] Loaded Successfully (Undetected)!")
+print("⚡ [Clean Master Hub v19.0] Loaded Successfully!")
